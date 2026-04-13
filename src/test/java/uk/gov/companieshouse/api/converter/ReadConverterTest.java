@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.web.server.ResponseStatusException;
 import uk.gov.companieshouse.api.exception.InternalServiceException;
 import uk.gov.companieshouse.api.psc.Statement;
 import uk.gov.companieshouse.api.utils.TestHelper;
