@@ -53,11 +53,7 @@
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml,
             ${project.basedir}/target/site/jacoco-it/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
-        <sonar.coverage.exclusions>
-            ${project.basedir}/src/main/java/uk/gov/companieshouse/api/model/CompanyProfileDocument.java,
-            ${project.basedir}/src/main/java/uk/gov/companieshouse/api/model/Created.java,
-            ${project.basedir}/src/main/java/uk/gov/companieshouse/api/model/Updated.java
-        </sonar.coverage.exclusions>
+
         <sonar.jacoco.reports>${project.basedir}/target/site</sonar.jacoco.reports>
         <sonar.java.binaries>${project.basedir}/target,${project.basedir}/target/*</sonar.java.binaries>
         <maven.compiler.source>${java.version}</maven.compiler.source>
