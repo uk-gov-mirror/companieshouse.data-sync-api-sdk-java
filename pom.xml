@@ -64,6 +64,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <log4j-api.version>2.25.4</log4j-api.version>
         <guava.version>32.0.1-android</guava.version>
+        <grpc-context.version>1.80.0</grpc-context.version>
     </properties>
 
     <dependencyManagement>
@@ -138,6 +139,12 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-context</artifactId>
+                <version>${grpc-context.version}</version>
                 <scope>compile</scope>
             </dependency>
         </dependencies>
