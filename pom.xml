@@ -18,7 +18,7 @@
     <properties>
         <java.version>21</java.version>
         <maven-build-helper-plugin.version>3.2.0</maven-build-helper-plugin.version>
-        <spring-boot-dependencies.version>3.5.7</spring-boot-dependencies.version>
+        <spring-boot-dependencies.version>3.5.13</spring-boot-dependencies.version>
 
         <!-- tests -->
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -28,9 +28,9 @@
         <skip.unit.tests>false</skip.unit.tests>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <docker-java-api.version>3.5.3</docker-java-api.version>
-        <spring-web.version>6.2.11</spring-web.version>
+        <spring-web.version>6.2.17</spring-web.version>
         <commons-lang3.version>3.19.0</commons-lang3.version>
-        <tomcat-embed-core.version>11.0.14</tomcat-embed-core.version>
+        <tomcat-embed-core.version>11.0.21</tomcat-embed-core.version>
         <junit-jupiter.version>5.14.1</junit-jupiter.version>
 
         <!-- Internal -->
@@ -53,10 +53,14 @@
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml,
             ${project.basedir}/target/site/jacoco-it/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
+
         <sonar.jacoco.reports>${project.basedir}/target/site</sonar.jacoco.reports>
         <sonar.java.binaries>${project.basedir}/target,${project.basedir}/target/*</sonar.java.binaries>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <log4j-api.version>2.25.4</log4j-api.version>
+        <guava.version>32.0.1-android</guava.version>
+        <grpc-context.version>1.80.0</grpc-context.version>
     </properties>
 
     <dependencyManagement>
@@ -121,6 +125,24 @@
             <version>${junit-jupiter.version}</version>
             <scope>test</scope>
           </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j-api.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-context</artifactId>
+                <version>${grpc-context.version}</version>
+                <scope>compile</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -154,21 +176,45 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>structured-logging</artifactId>
             <version>${structured-logging.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>private-api-sdk-java</artifactId>
             <version>${private-api-sdk-java.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>api-security-java</artifactId>
             <version>${api-security-java.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>api-sdk-manager-java-library</artifactId>
             <version>${api-sdk-manager-java-library.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
@@ -217,6 +263,9 @@
                     <destFile>${sonar.jacoco.reports}/jacoco.exec</destFile>
                     <dataFile>${sonar.jacoco.reports}/jacoco.exec</dataFile>
                     <outputDirectory>${sonar.jacoco.reports}/jacoco</outputDirectory>
+                    <excludes>
+                        <exclude>uk/gov/companieshouse/api/model/**</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
