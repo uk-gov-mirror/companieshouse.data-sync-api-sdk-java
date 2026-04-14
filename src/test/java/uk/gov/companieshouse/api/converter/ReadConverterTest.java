@@ -1,14 +1,13 @@
 package uk.gov.companieshouse.api.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
 import org.bson.Document;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import uk.gov.companieshouse.api.exception.InternalServiceException;
+import tools.jackson.databind.ObjectMapper;
 import uk.gov.companieshouse.api.psc.Statement;
 import uk.gov.companieshouse.api.utils.TestHelper;
 
@@ -35,19 +34,19 @@ class ReadConverterTest {
     }
 
     @Test
-    void testConvertThrowsInternalServiceExceptionOnJsonError() throws Exception {
+    void testConvertThrowsInternalServiceExceptionOnJsonError() {
         // GIVEN
         ObjectMapper objectMapper = mock(ObjectMapper.class);
         Document source = new Document();
         when(objectMapper.readValue(anyString(), ArgumentMatchers.<Class<Object>>any()))
-                .thenThrow(new JsonProcessingException("Error") {});
+                .thenThrow(new JacksonException("Error") {});
 
         // WHEN
         ReadConverter<Statement> converter = new ReadConverter<>(objectMapper, Statement.class);
 
         // THEN
-        Exception ex = Assertions.assertThrows(InternalServiceException.class, () -> converter.convert(source));
-        Assertions.assertEquals("failed to read and convert Document to JSON", ex.getMessage());
+        Exception ex = Assertions.assertThrows(JacksonException.class, () -> converter.convert(source));
+        Assertions.assertEquals("Error", ex.getMessage());
 
     }
 }
