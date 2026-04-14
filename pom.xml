@@ -267,6 +267,9 @@
                     <destFile>${sonar.jacoco.reports}/jacoco.exec</destFile>
                     <dataFile>${sonar.jacoco.reports}/jacoco.exec</dataFile>
                     <outputDirectory>${sonar.jacoco.reports}/jacoco</outputDirectory>
+                    <excludes>
+                        <exclude>uk/gov/companieshouse/api/model/**</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
