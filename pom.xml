@@ -28,7 +28,7 @@
         <skip.unit.tests>false</skip.unit.tests>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <docker-java-api.version>3.5.3</docker-java-api.version>
-        <spring-web.version>6.2.11</spring-web.version>
+        <spring-web.version>6.2.17</spring-web.version>
         <commons-lang3.version>3.19.0</commons-lang3.version>
         <tomcat-embed-core.version>11.0.21</tomcat-embed-core.version>
         <junit-jupiter.version>5.14.1</junit-jupiter.version>
