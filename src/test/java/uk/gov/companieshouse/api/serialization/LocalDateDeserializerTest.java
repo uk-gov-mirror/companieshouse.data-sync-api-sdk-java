@@ -52,6 +52,18 @@ class LocalDateDeserializerTest {
     void invalidStringReturnsError() {
         String jsonTestString = "{\"date\":{\"$date\": \"NotADate\"}}}";
 
+        assertThrows(java.time.format.DateTimeParseException.class, () -> deserialize(jsonTestString));
+    }
+
+    @Test
+    void missingDateFieldReturnsError() {
+        String jsonTestString = "{\"date\":{}}";
+        assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
+    }
+
+    @Test
+    void nullDateFieldReturnsError() {
+        String jsonTestString = "{\"date\":{\"$date\":null}}";
         assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
     }
 
