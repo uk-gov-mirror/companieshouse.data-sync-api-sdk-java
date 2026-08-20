@@ -1,7 +1,12 @@
 package uk.gov.companieshouse.api.serialization;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Assertions;
@@ -10,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 
 import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ObjectMapper;
 import uk.gov.companieshouse.api.exception.BadRequestException;
 
@@ -31,7 +37,7 @@ class LocalDateDeserializerTest {
         String jsonTestString = "{\"date\":{\"$date\": \"2023-01-09T00:00:00Z\"}}";
 
         LocalDate returnedDate = deserialize(jsonTestString);
-        Assertions.assertEquals(LocalDate.of(2023, 1, 9), returnedDate);
+        assertEquals(LocalDate.of(2023, 1, 9), returnedDate);
     }
 
     @Test
@@ -39,7 +45,7 @@ class LocalDateDeserializerTest {
         String jsonTestString = "{\"date\":{\"$date\": {\"$numberLong\":\"-1431388800000\"}}}";
 
         LocalDate returnedDate = deserialize(jsonTestString);
-        Assertions.assertEquals(LocalDate.of(1924, 8, 23), returnedDate);
+        assertEquals(LocalDate.of(1924, 8, 23), returnedDate);
     }
 
     @Test
@@ -52,19 +58,45 @@ class LocalDateDeserializerTest {
     void invalidStringReturnsError() {
         String jsonTestString = "{\"date\":{\"$date\": \"NotADate\"}}}";
 
-        assertThrows(java.time.format.DateTimeParseException.class, () -> deserialize(jsonTestString));
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
+
+        assertEquals("Deserialization failed.", exception.getMessage());
     }
 
     @Test
     void missingDateFieldReturnsError() {
         String jsonTestString = "{\"date\":{}}";
-        assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
+        assertEquals("$date field is missing or null", exception.getMessage());
     }
 
     @Test
     void nullDateFieldReturnsError() {
         String jsonTestString = "{\"date\":{\"$date\":null}}";
-        assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
+        assertEquals("$date field is missing or null", exception.getMessage());
+    }
+
+    @Test
+    void invalidDateShouldReturnError() throws Exception {
+
+        JsonParser parser = mock(JsonParser.class);
+        when(parser.readValueAsTree())
+                .thenThrow(new RuntimeException("Invalid JSON"));
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> deserializer.deserialize(parser, null));
+
+        assertEquals("Deserialization failed.", exception.getMessage());
+    }
+
+    @Test
+    void invalidNumberLongReturnError() throws Exception {
+        String jsonTestString = "{\"date\":{\"$date\": {\"$numberLong\":\"not-a-number\"}}}";
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
+
+        assertEquals("Deserialization failed.", exception.getMessage());
     }
 
     private LocalDate deserialize(String jsonString) {
@@ -76,11 +108,6 @@ class LocalDateDeserializerTest {
             // Pass null for DeserializationContext as it's not used in the deserializer
             return deserializer.deserialize(parser, null);
         } catch (Exception e) {
-            // Unwrap if it's a RuntimeException wrapping another exception
-            if (e instanceof RuntimeException && e.getCause() != null) {
-                throw (RuntimeException) e.getCause();
-            }
-            // Otherwise, rethrow as is
             throw e;
         }
     }
