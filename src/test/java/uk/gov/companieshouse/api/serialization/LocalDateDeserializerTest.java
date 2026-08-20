@@ -2,20 +2,16 @@ package uk.gov.companieshouse.api.serialization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.time.LocalDate;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
 import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ObjectMapper;
 import uk.gov.companieshouse.api.exception.BadRequestException;
 
