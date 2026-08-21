@@ -17,6 +17,8 @@ import uk.gov.companieshouse.api.exception.BadRequestException;
 
 class LocalDateDeserializerTest {
 
+    private static final String DESERIALISATION_FALIED_EXCEPTION_MESSAGE = "Deserialization failed.";
+    private static final String DATE_FIELD_MISSING_OR_NULL = "$date field is missing or null";
     private LocalDateDeserializer deserializer;
 
     private ObjectMapper mapper;
@@ -54,45 +56,39 @@ class LocalDateDeserializerTest {
     void invalidStringReturnsError() {
         String jsonTestString = "{\"date\":{\"$date\": \"NotADate\"}}}";
 
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
-
-        assertEquals("Deserialization failed.", exception.getMessage());
+        assertException(DESERIALISATION_FALIED_EXCEPTION_MESSAGE, jsonTestString);
     }
 
     @Test
     void missingDateFieldReturnsError() {
         String jsonTestString = "{\"date\":{}}";
 
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
-        assertEquals("$date field is missing or null", exception.getMessage());
+        assertException(DATE_FIELD_MISSING_OR_NULL, jsonTestString);
     }
 
     @Test
     void nullDateFieldReturnsError() {
         String jsonTestString = "{\"date\":{\"$date\":null}}";
 
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
-        assertEquals("$date field is missing or null", exception.getMessage());
+        assertException(DATE_FIELD_MISSING_OR_NULL, jsonTestString);
     }
 
     @Test
-    void invalidDateShouldReturnError() throws Exception {
+    void invalidDateShouldReturnError() {
 
         JsonParser parser = mock(JsonParser.class);
         when(parser.readValueAsTree())
                 .thenThrow(new RuntimeException("Invalid JSON"));
         BadRequestException exception = assertThrows(BadRequestException.class, () -> deserializer.deserialize(parser, null));
 
-        assertEquals("Deserialization failed.", exception.getMessage());
+        assertEquals(DESERIALISATION_FALIED_EXCEPTION_MESSAGE, exception.getMessage());
     }
 
     @Test
-    void invalidNumberLongReturnError() throws Exception {
+    void invalidNumberLongReturnError() {
         String jsonTestString = "{\"date\":{\"$date\": {\"$numberLong\":\"not-a-number\"}}}";
 
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
-
-        assertEquals("Deserialization failed.", exception.getMessage());
+        assertException(DESERIALISATION_FALIED_EXCEPTION_MESSAGE, jsonTestString);
     }
 
     private LocalDate deserialize(String jsonString) {
@@ -106,6 +102,12 @@ class LocalDateDeserializerTest {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    private void assertException(String expectedMessage, String jsonTestString) {
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
+
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
 }
