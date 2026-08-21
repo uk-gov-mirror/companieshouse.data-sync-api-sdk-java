@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class TransactionKindResultTest {
 
@@ -79,13 +78,15 @@ class TransactionKindResultTest {
     void hashCodeShouldHandleNullValues() {
         TransactionKindResult result = new TransactionKindResult(null, null);
 
-        assertNotNull(result.hashCode());
+        int hashcode = result.hashCode();
+        assertNotEquals(0, hashcode);
     }
 
     @Test
     void hashCodeShouldHandleNonNullValues() {
         TransactionKindResult result = new TransactionKindResult("id1", TransactionKind.RESOLUTION);
 
-        assertNotNull(result.hashCode());
+        int hashcode = result.hashCode();
+        assertNotEquals(0, hashcode);
     }
 }
