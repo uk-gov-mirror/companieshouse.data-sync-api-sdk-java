@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.api.serialization;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +8,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.core.JsonGenerator;
 
 import java.time.LocalDate;
 
@@ -31,7 +31,7 @@ class LocalDateSerializerTest {
     }
 
     @Test
-    void dateShouldSerialize() throws Exception {
+    void dateShouldSerialize() {
         LocalDate date = LocalDate.of(2020, 1, 1);
 
         serializer.serialize(date, generator, null);
@@ -41,10 +41,8 @@ class LocalDateSerializerTest {
     }
 
     @Test
-    void assertNullDateReturnsNull() throws Exception {
-
+    void assertNullDateReturnsNull() {
         serializer.serialize(null, generator, null);
-
         verify(generator).writeNull();
     }
 }

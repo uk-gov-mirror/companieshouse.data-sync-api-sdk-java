@@ -30,10 +30,9 @@ public class TransactionKindResult {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof TransactionKindResult)) {
+        if (!(obj instanceof TransactionKindResult cmp)) {
             return false;
         }
-        TransactionKindResult cmp = (TransactionKindResult) obj;
 
         final boolean sameKind = (this.kind == null && cmp.kind == null) ||
                 (this.kind != null && this.kind.equals(cmp.kind));

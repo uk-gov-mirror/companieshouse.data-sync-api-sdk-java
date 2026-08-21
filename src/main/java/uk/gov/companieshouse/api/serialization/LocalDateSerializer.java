@@ -1,24 +1,21 @@
 package uk.gov.companieshouse.api.serialization;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.core.JsonGenerator;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class LocalDateSerializer extends JsonSerializer<LocalDate> {
-
+public class LocalDateSerializer extends ValueSerializer<LocalDate> {
     @Override
-    public void serialize(LocalDate localDate, JsonGenerator jsonGenerator,
-                          SerializerProvider serializerProvider) throws IOException {
-        if (localDate == null) {
-            jsonGenerator.writeNull();
+    public void serialize(LocalDate value, JsonGenerator gen, SerializationContext ctxt) {
+        if (value == null) {
+            gen.writeNull();
         } else {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-            String format = localDate.atStartOfDay().format(dtf);
-            jsonGenerator.writeRawValue("ISODate(\"" + format + "\")");
+            String format = value.atStartOfDay().format(dtf);
+            gen.writeRawValue("ISODate(\"" + format + "\")");
         }
     }
 }

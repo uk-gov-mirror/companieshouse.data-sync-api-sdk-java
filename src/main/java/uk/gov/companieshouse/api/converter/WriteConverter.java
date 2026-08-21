@@ -1,7 +1,6 @@
 package uk.gov.companieshouse.api.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
@@ -21,10 +20,6 @@ public class WriteConverter<S> implements Converter<S, BasicDBObject> {
      */
     @Override
     public BasicDBObject convert(S source) {
-        try {
-          return BasicDBObject.parse(objectMapper.writeValueAsString(source));
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(e);
-        }
+        return BasicDBObject.parse(objectMapper.writeValueAsString(source));
     }
 }
