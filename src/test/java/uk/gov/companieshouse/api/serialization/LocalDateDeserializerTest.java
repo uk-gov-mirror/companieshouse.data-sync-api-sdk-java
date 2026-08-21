@@ -1,10 +1,12 @@
 package uk.gov.companieshouse.api.serialization;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +17,8 @@ import uk.gov.companieshouse.api.exception.BadRequestException;
 
 class LocalDateDeserializerTest {
 
+    private static final String DESERIALISATION_FALIED_EXCEPTION_MESSAGE = "Deserialization failed.";
+    private static final String DATE_FIELD_MISSING_OR_NULL = "$date field is missing or null";
     private LocalDateDeserializer deserializer;
 
     private ObjectMapper mapper;
@@ -31,7 +35,7 @@ class LocalDateDeserializerTest {
         String jsonTestString = "{\"date\":{\"$date\": \"2023-01-09T00:00:00Z\"}}";
 
         LocalDate returnedDate = deserialize(jsonTestString);
-        Assertions.assertEquals(LocalDate.of(2023, 1, 9), returnedDate);
+        assertEquals(LocalDate.of(2023, 1, 9), returnedDate);
     }
 
     @Test
@@ -39,7 +43,7 @@ class LocalDateDeserializerTest {
         String jsonTestString = "{\"date\":{\"$date\": {\"$numberLong\":\"-1431388800000\"}}}";
 
         LocalDate returnedDate = deserialize(jsonTestString);
-        Assertions.assertEquals(LocalDate.of(1924, 8, 23), returnedDate);
+        assertEquals(LocalDate.of(1924, 8, 23), returnedDate);
     }
 
     @Test
@@ -52,19 +56,39 @@ class LocalDateDeserializerTest {
     void invalidStringReturnsError() {
         String jsonTestString = "{\"date\":{\"$date\": \"NotADate\"}}}";
 
-        assertThrows(java.time.format.DateTimeParseException.class, () -> deserialize(jsonTestString));
+        assertException(DESERIALISATION_FALIED_EXCEPTION_MESSAGE, jsonTestString);
     }
 
     @Test
     void missingDateFieldReturnsError() {
         String jsonTestString = "{\"date\":{}}";
-        assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
+
+        assertException(DATE_FIELD_MISSING_OR_NULL, jsonTestString);
     }
 
     @Test
     void nullDateFieldReturnsError() {
         String jsonTestString = "{\"date\":{\"$date\":null}}";
-        assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
+
+        assertException(DATE_FIELD_MISSING_OR_NULL, jsonTestString);
+    }
+
+    @Test
+    void invalidDateShouldReturnError() {
+
+        JsonParser parser = mock(JsonParser.class);
+        when(parser.readValueAsTree())
+                .thenThrow(new RuntimeException("Invalid JSON"));
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> deserializer.deserialize(parser, null));
+
+        assertEquals(DESERIALISATION_FALIED_EXCEPTION_MESSAGE, exception.getMessage());
+    }
+
+    @Test
+    void invalidNumberLongReturnError() {
+        String jsonTestString = "{\"date\":{\"$date\": {\"$numberLong\":\"not-a-number\"}}}";
+
+        assertException(DESERIALISATION_FALIED_EXCEPTION_MESSAGE, jsonTestString);
     }
 
     private LocalDate deserialize(String jsonString) {
@@ -76,13 +100,14 @@ class LocalDateDeserializerTest {
             // Pass null for DeserializationContext as it's not used in the deserializer
             return deserializer.deserialize(parser, null);
         } catch (Exception e) {
-            // Unwrap if it's a RuntimeException wrapping another exception
-            if (e instanceof RuntimeException && e.getCause() != null) {
-                throw (RuntimeException) e.getCause();
-            }
-            // Otherwise, rethrow as is
             throw e;
         }
+    }
+
+    private void assertException(String expectedMessage, String jsonTestString) {
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> deserialize(jsonTestString));
+
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
 }
